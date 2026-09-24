@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash")
 
 class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]

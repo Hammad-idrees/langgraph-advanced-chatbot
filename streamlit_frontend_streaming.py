@@ -1,7 +1,11 @@
+import re
+import time
 import uuid
 import streamlit as st
 from langchain_core.messages import HumanMessage
 from langgraph_backend import chatbot
+
+TYPING_DELAY = 0.02  # seconds between words
 
 
 def extract_text(content) -> str:
@@ -103,18 +107,25 @@ if user_input:
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # Get the assistant's response, streamed into the UI token by token
-    def stream_response():
-        for message_chunk, _metadata in chatbot.stream(
-            {"messages": [HumanMessage(content=user_input)]},
-            config=CONFIG,
-            stream_mode="messages",
-        ):
-            text = extract_text(message_chunk.content)
-            if text:
-                yield text
-
     with st.chat_message("assistant"):
+        thinking = st.empty()
+        thinking.markdown("_Thinking…_")
+
+        # Gemini sends large chunks, so re-split them into words for a typing effect
+        def stream_response():
+            for message_chunk, _metadata in chatbot.stream(
+                {"messages": [HumanMessage(content=user_input)]},
+                config=CONFIG,
+                stream_mode="messages",
+            ):
+                text = extract_text(message_chunk.content)
+                if not text:
+                    continue
+                thinking.empty()
+                for word in re.findall(r"\S+\s*|\s+", text):
+                    yield word
+                    time.sleep(TYPING_DELAY)
+
         ai_message = st.write_stream(stream_response)
 
     st.session_state["message_history"].append({"role": "assistant", "content": ai_message})

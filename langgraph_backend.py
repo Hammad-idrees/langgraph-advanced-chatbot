@@ -8,7 +8,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash")
+# Low thinking level: the model otherwise thinks for ~25s before emitting any text
+llm = ChatGoogleGenerativeAI(
+    model="gemini-3.8-flash",
+    thinking_config={"thinking_level": "low"},
+)
 
 class ChatState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]

@@ -5,7 +5,7 @@ import uuid
 import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage
 
-from langgraph_backend import chatbot
+from langgraph_tool_backend import chatbot
 
 TYPING_DELAY = 0.02  # seconds between words
 TITLE_LENGTH = 40
